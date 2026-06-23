@@ -100,15 +100,26 @@
     margin: 6px 0 10px;
     color: #111;
     height: 64px;
+    visibility: hidden;
   }
+  .timer.visible { visibility: visible; }
   .next {
     font-size: 13px;
     color: #999;
     font-weight: 500;
     min-height: 18px;
   }
-  .cta {
+  .cta-wrap {
     margin-top: 36px;
+    width: 100%;
+    max-width: 380px;
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .cta {
+    margin-top: 0;
     background: #FF6B35;
     color: #FFFCF5;
     font-size: 22px;
@@ -119,7 +130,6 @@
     border: none;
     cursor: pointer;
     width: 100%;
-    max-width: 380px;
     box-shadow: 0 10px 24px rgba(255,107,53,0.32), 0 2px 4px rgba(255,107,53,0.20);
     transition: transform .12s ease, box-shadow .12s ease, filter .12s;
     -webkit-tap-highlight-color: transparent;
@@ -127,6 +137,31 @@
   .cta:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 14px 32px rgba(255,107,53,0.38), 0 3px 6px rgba(255,107,53,0.24); filter: saturate(1.05); }
   .cta:active { transform: translateY(0) scale(0.99); box-shadow: 0 6px 16px rgba(255,107,53,0.28); }
   .cta:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
+  .launch-options {
+    display: none;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+  .launch-options.open { display: grid; }
+  .launch-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 58px;
+    background: #111;
+    color: #FFFCF5;
+    border: 2px solid #111;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+  }
+  .launch-option:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0,0,0,0.16); background: #FF6B35; }
+  .launch-option:active { transform: translateY(0); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+  .launch-option:focus-visible { outline: 3px solid #FF6B35; outline-offset: 3px; }
   .trust {
     margin-top: 12px;
     font-size: 14px;
@@ -197,8 +232,10 @@
   .modal-left h2 { font-size: 54px; font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; margin-bottom: 28px; color: #111; }
   .modal-left p { font-size: 19px; line-height: 1.6; color: rgba(17,17,17,0.78); max-width: 65ch; margin-bottom: 18px; font-weight: 500; }
   .modal-right { display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; }
-  .demo-stage { position: relative; width: 100%; display: flex; flex-direction: row; align-items: center; gap: 32px; padding: 20px 60px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); }
-  .demo-stage::-webkit-scrollbar { display: none; }
+  .demo-stage { position: relative; width: 100%; padding: 20px 0; overflow: hidden; mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); }
+  .demo-track { display: flex; align-items: center; gap: 32px; width: max-content; animation: demoMarquee 24s linear infinite; will-change: transform; }
+  .demo-stage:hover .demo-track { animation-play-state: paused; }
+  @keyframes demoMarquee { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 16px)); } }
   .demo-item { position: relative; min-width: 320px; height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; scroll-snap-align: center; flex-shrink: 0; opacity: 1; pointer-events: auto; }
   .demo-label { margin-top: 18px; font-size: 13px; color: #8a8a8a; font-weight: 600; letter-spacing: .01em; }
   .demo-item[data-demo="android"] .phone { transform: scale(0.72); transform-origin: center; }
@@ -245,6 +282,7 @@
     .card { margin-top: 36px; padding: 28px 24px; border-radius: 24px; }
     .timer { font-size: 56px; height: 56px; }
     .cta { padding: 18px 28px; font-size: 20px; border-radius: 16px; }
+    .cta-wrap { min-height: 64px; }
     .sub { font-size: 18px; }
     .modal-close { top: 8px; right: 10px; }
     .modal-grid { padding: 64px 20px 32px; }
@@ -264,7 +302,7 @@
     h1 { font-size: 56px; }
     .card { margin-top: 28px; padding: 24px; }
     .timer { font-size: 52px; height: 52px; }
-    .cta { margin-top: 28px; }
+    .cta-wrap { margin-top: 28px; }
     main { justify-content: flex-start; padding-top: 84px; }
   }
 </style>
@@ -281,11 +319,18 @@
         <span class="pill" id="pill" style="background:#6B7280">CAPTURE</span>
       </div>
       <div class="task">Write landing page</div>
-      <div class="timer" id="timer" aria-live="off" style="display:none">00:00</div>
+      <div class="timer" id="timer" aria-live="off">00:00</div>
       <div class="next" id="cardSub">dumped to Things</div>
     </div>
 
-    <button class="cta" id="cta" aria-label="Start now">Start now →</button>
+    <div class="cta-wrap">
+      <button class="cta" id="cta" aria-label="Start now">Start now →</button>
+      <div class="launch-options" id="launchOptions" aria-label="Launch options">
+        <a class="launch-option" href="#mac-download">Mac app download</a>
+        <a class="launch-option" href="#android-app">Android app</a>
+        <a class="launch-option" href="#web-app">Web app launch</a>
+      </div>
+    </div>
     <div class="trust">No signup. No AI. Free.</div>
   </main>
 
@@ -316,7 +361,8 @@
           <p>Then you pick ONE thing for Doing. Flow shows only that task with a timer. Mac menu bar, Android share, and web all sync to the same Doing. No AI planning, no backlog guilt, no chat.</p>
         </div>
         <div class="modal-right">
-          <div class="demo-stage">
+          <div class="demo-stage" aria-label="Buubo app illustrations">
+            <div class="demo-track">
             <div class="demo-item" data-demo="mac">
               <div class="mac-window">
                 <div class="mac-bar">
@@ -364,6 +410,54 @@
               </div>
               <div class="demo-label">Web</div>
             </div>
+            <div class="demo-item" data-demo="mac" aria-hidden="true">
+              <div class="mac-window">
+                <div class="mac-bar">
+                  <span class="apple"></span>
+                  <span class="mac-app">buubo</span>
+                  <span class="mac-right">⌃⌥⌘</span>
+                </div>
+                <div class="mac-dropdown">
+                  <span class="pill tiny">DOING</span>
+                  <span>Write landing page</span>
+                  <span class="mac-time">23:14</span>
+                </div>
+                <div class="mac-desktop"></div>
+              </div>
+              <div class="demo-label">macOS menu bar</div>
+            </div>
+            <div class="demo-item" data-demo="android" aria-hidden="true">
+              <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="share-sheet">
+                  <div class="share-handle"></div>
+                  <div class="share-title">Add to Buubo</div>
+                  <div class="share-input">Write landing page</div>
+                  <div class="share-row">
+                    <span class="share-tag">Things</span>
+                    <button class="share-add" tabindex="-1">Add</button>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-label">Android share</div>
+            </div>
+            <div class="demo-item" data-demo="web" aria-hidden="true">
+              <div class="browser">
+                <div class="browser-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span class="browser-url">buubo.app</span>
+                </div>
+                <div class="browser-body">
+                  <div class="mini-card">
+                    <span class="pill tiny">DOING</span>
+                    <div class="mini-task">Write landing page</div>
+                    <div class="mini-timer">23:14</div>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-label">Web</div>
+            </div>
+            </div>
           </div>
         </div>
       </div>
@@ -390,7 +484,7 @@
     pillEl.style.background = s.color;
     subEl.textContent = s.sub;
     if (s.showTimer) {
-      timerEl.style.display = 'block';
+      timerEl.classList.add('visible');
       secs = 0;
       timerEl.textContent = '00:00';
       clearInterval(tick);
@@ -401,7 +495,7 @@
         timerEl.textContent = `${m}:${ss}`;
       }, 1000);
     } else {
-      timerEl.style.display = 'none';
+      timerEl.classList.remove('visible');
       clearInterval(tick);
     }
   }
@@ -441,11 +535,14 @@
   gotit.addEventListener('click', closeTooltip);
 
   const cta = document.getElementById('cta');
+  const launchOptions = document.getElementById('launchOptions');
   cta.addEventListener('click', () => {
     cta.style.transform = 'scale(0.97)';
     setTimeout(() => { cta.style.transform = ''; }, 140);
     document.querySelector('.card').style.animation = 'none';
     setTimeout(() => document.querySelector('.card').style.animation = 'breathe 4s ease-in-out infinite', 10);
+    cta.hidden = true;
+    launchOptions.classList.add('open');
   });
 
   document.addEventListener('click', (e) => {
