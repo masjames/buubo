@@ -248,15 +248,10 @@
   /*
    * FIX 2 — Infinite scroll on the illustration reel
    *
-   * The stage clips overflow. The inner track holds items + their clones
-   * side-by-side (added via JS on first modal open).
-   *
-   * Each .demo-item is 420 px wide with a 40 px right margin, making
-   * each "slot" exactly 460 px.  With 3 original items the first half
-   * of the track is 3 × 460 = 1380 px.  The animation moves the track
-   * by −50 % of its own max-content width (= −1380 px once clones are
-   * appended), which lands perfectly on the start of the clone set —
-   * creating a seamless loop.
+   * The stage clips overflow while JS gently moves the existing cards
+   * leftward and recycles the first card to the end once it exits. That
+   * keeps the scroll infinite without adding a duplicated illustration
+   * row below the reel.
    */
   .demo-stage {
     position: relative;
@@ -268,20 +263,12 @@
   }
   .demo-track {
     display: flex;
-    /* max-content lets translateX(-50%) reference the track's own width */
+    flex-wrap: nowrap;
+    align-items: center;
     width: max-content;
     will-change: transform;
-    animation: demo-scroll 20s linear infinite;
   }
-  /* Pause on hover so the user can inspect a card */
-  .demo-stage:hover .demo-track { animation-play-state: paused; }
-
-  @keyframes demo-scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-  /* Using margin-right (not flex gap) so that -50% of max-content width
-     equals exactly the width of the original 3-item set. */
+  /* Margin-right defines the slot width JS uses before recycling an item. */
   .demo-item {
     width: 420px;
     margin-right: 40px;
@@ -418,7 +405,6 @@
         </div>
         <div class="modal-right">
           <div class="demo-stage">
-            <!-- demo-track cloned by JS on first open for seamless infinite loop -->
             <div class="demo-track" id="demoTrack">
               <div class="demo-item" data-demo="mac">
                 <div class="mac-window">
@@ -512,18 +498,46 @@
   showState();
   setInterval(() => { idx = (idx + 1) % 3; showState(); }, 3000);
 
-  /* ─── FIX 2: Infinite scroll — clone items on first modal open ─ */
+  /* ─── FIX 2: Infinite scroll — recycle existing items only ─ */
   function setupInfiniteScroll() {
     const track = document.getElementById('demoTrack');
     if (!track || track.dataset.infiniteInit) return;
     track.dataset.infiniteInit = '1';
-    // Append deep clones of all original items; the doubled track
-    // lets translateX(-50%) loop back to the visual start perfectly.
-    [...track.querySelectorAll('.demo-item')].forEach(item => {
-      const clone = item.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      track.appendChild(clone);
-    });
+
+    let offset = 0;
+    let lastTime = performance.now();
+    let paused = false;
+    const speed = 34; // px per second
+
+    track.addEventListener('mouseenter', () => { paused = true; });
+    track.addEventListener('mouseleave', () => { paused = false; });
+
+    function getSlotWidth() {
+      const first = track.querySelector('.demo-item');
+      if (!first) return 0;
+      const styles = getComputedStyle(first);
+      return first.offsetWidth + parseFloat(styles.marginRight || '0');
+    }
+
+    function animate(now) {
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      if (!paused) {
+        offset -= delta * speed;
+        let slotWidth = getSlotWidth();
+        while (slotWidth && Math.abs(offset) >= slotWidth) {
+          offset += slotWidth;
+          track.appendChild(track.firstElementChild);
+          slotWidth = getSlotWidth();
+        }
+        track.style.transform = `translateX(${offset}px)`;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
   }
 
   /* ─── FIX 3: CTA → platform picker ──────────────────────────── */
