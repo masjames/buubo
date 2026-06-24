@@ -4,6 +4,10 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-23",
   "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "build": {
+    "command": "npm run opennext:build"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
