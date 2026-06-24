@@ -14,6 +14,7 @@ jobs:
   deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
     env:
@@ -35,9 +36,9 @@ jobs:
 
       - name: Validate required secrets
         run: |
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          test -n "$CLOUDFLARE_API_TOKEN"
-          test -n "$DATABASE_URL"
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "CLOUDFLARE_ACCOUNT_ID is not available. Add it as a repository secret or production environment secret."; exit 1; }
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "CLOUDFLARE_API_TOKEN is not available. Add it as a repository secret or production environment secret."; exit 1; }
+          test -n "$DATABASE_URL" || { echo "DATABASE_URL is not available. Add it as a repository secret or production environment secret."; exit 1; }
 
       - name: Configure DATABASE_URL secret in Cloudflare
         run: printf '%s' "$DATABASE_URL" | npx wrangler secret put DATABASE_URL
