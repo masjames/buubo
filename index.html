@@ -91,6 +91,12 @@
     margin: 18px 0 6px;
     letter-spacing: -0.01em;
   }
+  /*
+   * FIX 1 — Stable CTA position
+   * Timer now uses opacity (not display) so it always occupies its
+   * 64px + margins in the layout. The card never changes height,
+   * so the button below never shifts vertically.
+   */
   .timer {
     font-size: 64px;
     font-weight: 900;
@@ -100,7 +106,8 @@
     margin: 6px 0 10px;
     color: #111;
     height: 64px;
-    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.35s ease;
   }
   .timer.visible { visibility: visible; }
   .next {
@@ -109,17 +116,17 @@
     font-weight: 500;
     min-height: 18px;
   }
+
+  /*
+   * FIX 1 (continued) — cta-wrap holds the margin-top that was on
+   * .cta before, keeping the button at a fixed distance from the card.
+   */
   .cta-wrap {
     margin-top: 36px;
     width: 100%;
     max-width: 380px;
-    min-height: 68px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
   }
   .cta {
-    margin-top: 0;
     background: #FF6B35;
     color: #FFFCF5;
     font-size: 22px;
@@ -131,92 +138,98 @@
     cursor: pointer;
     width: 100%;
     box-shadow: 0 10px 24px rgba(255,107,53,0.32), 0 2px 4px rgba(255,107,53,0.20);
-    transition: transform .12s ease, box-shadow .12s ease, filter .12s;
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease,
+                background-color .22s ease, padding .22s ease, font-size .22s ease,
+                letter-spacing .22s ease;
     -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
   }
   .cta:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 14px 32px rgba(255,107,53,0.38), 0 3px 6px rgba(255,107,53,0.24); filter: saturate(1.05); }
   .cta:active { transform: translateY(0) scale(0.99); box-shadow: 0 6px 16px rgba(255,107,53,0.28); }
   .cta:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
-  .launch-options {
-    display: none;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    width: 100%;
-  }
-  .launch-options.open { display: grid; }
-  .launch-option {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 58px;
+
+  /* picked = platform-selector mode */
+  .cta.picked {
     background: #111;
-    color: #FFFCF5;
-    border: 2px solid #111;
-    border-radius: 16px;
-    font-size: 17px;
-    font-weight: 800;
-    text-decoration: none;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
-    transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 13px 20px;
+    box-shadow: none;
   }
-  .launch-option:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0,0,0,0.16); background: #FF6B35; }
-  .launch-option:active { transform: translateY(0); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
-  .launch-option:focus-visible { outline: 3px solid #FF6B35; outline-offset: 3px; }
+  .cta.picked:hover { transform: none; filter: none; box-shadow: none; background: #2a2a2a; }
+
+  /*
+   * FIX 3 — Platform picker panel
+   */
+  .cta-choices {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    animation: choices-in 0.36s cubic-bezier(.18,.82,.26,1) both;
+  }
+  .cta-choices[hidden] { display: none; }
+  @keyframes choices-in {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)     scale(1);    }
+  }
+  .choice-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 16px 6px 12px;
+    background: #fff;
+    border: 2px solid #111;
+    border-radius: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #111;
+    transition: background .15s, border-color .15s, transform .12s, box-shadow .12s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .choice-btn:hover {
+    background: #FFF5EF;
+    border-color: #FF6B35;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,107,53,0.16);
+  }
+  .choice-btn:active { transform: scale(0.97); }
+  .choice-ico  { font-size: 22px; line-height: 1; display: block; }
+  .choice-name { font-size: 12px; font-weight: 800; letter-spacing: 0.01em; display: block; }
+  .choice-sub  { font-size: 10px; font-weight: 600; color: #aaa; display: block; }
+
   .trust {
     margin-top: 12px;
     font-size: 14px;
     color: rgba(17,17,17,0.55);
     font-weight: 500;
   }
-  .what-wrap {
+  .more-wrap {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 4px;
     z-index: 40;
   }
-  .what, .what-link {
+  .more-btn {
     background: none;
     border: none;
     font-size: 13px;
-    color: #9a9a9a;
+    font-weight: 700;
+    color: #FF6B35;
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-style: dotted;
+    text-decoration-color: rgba(255,107,53,0.45);
     cursor: pointer;
-    padding: 8px 6px;
-    font-weight: 500;
+    padding: 8px 10px;
     -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
   }
-  .what:hover, .what-link:hover { color: #666; }
-  .what-link.more { color: #FF6B35; font-weight: 700; text-decoration-color: rgba(255,107,53,0.45); }
-  .what-sep { color: #c2c2c2; font-size: 13px; user-select: none; }
-  .what-open { display: flex; align-items: center; gap: 2px; }
-
-  .how {
-    position: fixed;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    display: flex;
-    gap: 28px;
-    background: #111;
-    color: #FFFCF5;
-    padding: 14px 20px;
-    border-radius: 14px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s ease, transform .2s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-    z-index: 10;
-  }
-  .how.open { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-  .how-item { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; }
-  .how-item strong { font-weight: 800; }
-  .how-item span:nth-child(2) { opacity: 0.5; }
+  .more-btn:hover { text-decoration-color: #FF6B35; }
 
   /* Modal */
   .modal { position: fixed; inset: 0; z-index: 200; display: none; }
@@ -232,15 +245,58 @@
   .modal-left h2 { font-size: 54px; font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; margin-bottom: 28px; color: #111; }
   .modal-left p { font-size: 19px; line-height: 1.6; color: rgba(17,17,17,0.78); max-width: 65ch; margin-bottom: 18px; font-weight: 500; }
   .modal-right { display: flex; align-items: center; justify-content: center; width: 100%; overflow: hidden; }
-  .demo-stage { position: relative; width: 100%; padding: 20px 0; overflow: hidden; mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0, black 60px, black calc(100% - 60px), transparent 100%); }
-  .demo-track { display: flex; align-items: center; gap: 32px; width: max-content; animation: demoMarquee 24s linear infinite; will-change: transform; }
+
+  /*
+   * FIX 2 — Infinite scroll on the illustration reel
+   *
+   * The stage clips overflow. The inner track holds items + their clones
+   * side-by-side (added via JS on first modal open).
+   *
+   * Each .demo-item is 420 px wide with a 40 px right margin, making
+   * each "slot" exactly 460 px.  With 3 original items the first half
+   * of the track is 3 × 460 = 1380 px.  The animation moves the track
+   * by −50 % of its own max-content width (= −1380 px once clones are
+   * appended), which lands perfectly on the start of the clone set —
+   * creating a seamless loop.
+   */
+  .demo-stage {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 20px 0;
+    mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
+  }
+  .demo-track {
+    display: flex;
+    /* max-content lets translateX(-50%) reference the track's own width */
+    width: max-content;
+    will-change: transform;
+    animation: demo-scroll 20s linear infinite;
+  }
+  /* Pause on hover so the user can inspect a card */
   .demo-stage:hover .demo-track { animation-play-state: paused; }
-  @keyframes demoMarquee { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 16px)); } }
-  .demo-item { position: relative; min-width: 320px; height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; scroll-snap-align: center; flex-shrink: 0; opacity: 1; pointer-events: auto; }
+
+  @keyframes demo-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  /* Using margin-right (not flex gap) so that -50% of max-content width
+     equals exactly the width of the original 3-item set. */
+  .demo-item {
+    width: 420px;
+    margin-right: 40px;
+    flex-shrink: 0;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
   .demo-label { margin-top: 18px; font-size: 13px; color: #8a8a8a; font-weight: 600; letter-spacing: .01em; }
   .demo-item[data-demo="android"] .phone { transform: scale(0.72); transform-origin: center; }
 
-  .mac-window { width: 420px; max-width: 92%; background: #fff; border: 2px solid #111; border-radius: 14px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.12); position: relative; }
+  .mac-window { width: 420px; max-width: 100%; background: #fff; border: 2px solid #111; border-radius: 14px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.12); position: relative; }
   .mac-bar { height: 30px; background: #111; color: #FFFCF5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; position: relative; padding: 0 12px; }
   .mac-bar .apple { position: absolute; left: 12px; font-size: 14px; opacity: .9; }
   .mac-bar .mac-right { position: absolute; right: 12px; opacity: .6; }
@@ -262,7 +318,7 @@
   .share-tag { font-size: 12px; background: #f0f0f0; padding: 4px 8px; border-radius: 6px; font-weight: 600; color: #555; }
   .share-add { background: #FF6B35; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 12px; }
 
-  .browser { width: 440px; max-width: 94%; background: #fff; border: 2px solid #111; border-radius: 14px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.12); }
+  .browser { width: 440px; max-width: 100%; background: #fff; border: 2px solid #111; border-radius: 14px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.12); }
   .browser-bar { height: 34px; background: #f5f2ea; border-bottom: 2px solid #111; display: flex; align-items: center; padding: 0 12px; gap: 10px; }
   .dots { display: flex; gap: 5px; } .dots i { width: 10px; height: 10px; border-radius: 50%; background: #111; opacity: .2; } .dots i:nth-child(1){opacity:.35}
   .browser-url { font-size: 12px; font-weight: 600; color: #777; background: #fff; border: 1px solid #e5ddd0; padding: 3px 8px; border-radius: 6px; }
@@ -282,7 +338,7 @@
     .card { margin-top: 36px; padding: 28px 24px; border-radius: 24px; }
     .timer { font-size: 56px; height: 56px; }
     .cta { padding: 18px 28px; font-size: 20px; border-radius: 16px; }
-    .cta-wrap { min-height: 64px; }
+    .cta.picked { font-size: 12px; padding: 11px 16px; }
     .sub { font-size: 18px; }
     .modal-close { top: 8px; right: 10px; }
     .modal-grid { padding: 64px 20px 32px; }
@@ -294,8 +350,6 @@
   @media (max-width: 390px) {
     h1 { font-size: 52px; }
     .wordmark { top: 20px; left: 20px; }
-    .how { gap: 16px; padding: 12px 14px; bottom: 56px; }
-    .how-item { font-size: 13px; }
     main { padding: 32px 20px 70px; }
   }
   @media (max-height: 700px) {
@@ -319,34 +373,37 @@
         <span class="pill" id="pill" style="background:#6B7280">CAPTURE</span>
       </div>
       <div class="task">Write landing page</div>
+      <!-- Timer always in layout flow; opacity controls visibility -->
       <div class="timer" id="timer" aria-live="off">00:00</div>
       <div class="next" id="cardSub">dumped to Things</div>
     </div>
 
+    <!-- cta-wrap locks the button at a stable vertical position -->
     <div class="cta-wrap">
       <button class="cta" id="cta" aria-label="Start now">Start now →</button>
-      <div class="launch-options" id="launchOptions" aria-label="Launch options">
-        <a class="launch-option" href="#mac-download">Mac app download</a>
-        <a class="launch-option" href="#android-app">Android app</a>
-        <a class="launch-option" href="#web-app">Web app launch</a>
+      <div class="cta-choices" id="ctaChoices" hidden>
+        <a href="#" class="choice-btn">
+          <span class="choice-ico">💻</span>
+          <span class="choice-name">Mac App</span>
+          <span class="choice-sub">Download</span>
+        </a>
+        <a href="#" class="choice-btn">
+          <span class="choice-ico">📱</span>
+          <span class="choice-name">Android</span>
+          <span class="choice-sub">Download</span>
+        </a>
+        <a href="#" class="choice-btn">
+          <span class="choice-ico">🌐</span>
+          <span class="choice-name">Web App</span>
+          <span class="choice-sub">Launch →</span>
+        </a>
       </div>
     </div>
     <div class="trust">No signup. No AI. Free.</div>
   </main>
 
-  <div class="what-wrap" id="whatWrap">
-    <button class="what" id="what" aria-expanded="false" aria-controls="how">what's this?</button>
-    <div class="what-open" id="whatOpen" hidden>
-      <button class="what-link" id="gotit">got it</button>
-      <span class="what-sep">•</span>
-      <button class="what-link more" id="more">more!!</button>
-    </div>
-  </div>
-
-  <div class="how" id="how" role="dialog" aria-hidden="true">
-    <div class="how-item"><strong>Dump</strong><span>→</span><span>Things</span></div>
-    <div class="how-item"><strong>Pick</strong><span>→</span><span>Doing</span></div>
-    <div class="how-item"><strong>Focus</strong><span>→</span><span>Done</span></div>
+  <div class="more-wrap">
+    <button class="more-btn" id="more">more!!</button>
   </div>
 
   <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
@@ -361,54 +418,56 @@
           <p>Then you pick ONE thing for Doing. Flow shows only that task with a timer. Mac menu bar, Android share, and web all sync to the same Doing. No AI planning, no backlog guilt, no chat.</p>
         </div>
         <div class="modal-right">
-          <div class="demo-stage" aria-label="Buubo app illustrations">
-            <div class="demo-track">
-            <div class="demo-item" data-demo="mac">
-              <div class="mac-window">
-                <div class="mac-bar">
-                  <span class="apple"></span>
-                  <span class="mac-app">buubo</span>
-                  <span class="mac-right">⌃⌥⌘</span>
-                </div>
-                <div class="mac-dropdown">
-                  <span class="pill tiny">DOING</span>
-                  <span>Write landing page</span>
-                  <span class="mac-time">23:14</span>
-                </div>
-                <div class="mac-desktop"></div>
-              </div>
-              <div class="demo-label">macOS menu bar</div>
-            </div>
-            <div class="demo-item" data-demo="android">
-              <div class="phone">
-                <div class="phone-notch"></div>
-                <div class="share-sheet">
-                  <div class="share-handle"></div>
-                  <div class="share-title">Add to Buubo</div>
-                  <div class="share-input">Write landing page</div>
-                  <div class="share-row">
-                    <span class="share-tag">Things</span>
-                    <button class="share-add" tabindex="-1">Add</button>
+          <div class="demo-stage">
+            <!-- demo-track cloned by JS on first open for seamless infinite loop -->
+            <div class="demo-track" id="demoTrack">
+              <div class="demo-item" data-demo="mac">
+                <div class="mac-window">
+                  <div class="mac-bar">
+                    <span class="apple"></span>
+                    <span class="mac-app">buubo</span>
+                    <span class="mac-right">⌃⌥⌘</span>
                   </div>
-                </div>
-              </div>
-              <div class="demo-label">Android share</div>
-            </div>
-            <div class="demo-item" data-demo="web">
-              <div class="browser">
-                <div class="browser-bar">
-                  <span class="dots"><i></i><i></i><i></i></span>
-                  <span class="browser-url">buubo.app</span>
-                </div>
-                <div class="browser-body">
-                  <div class="mini-card">
+                  <div class="mac-dropdown">
                     <span class="pill tiny">DOING</span>
-                    <div class="mini-task">Write landing page</div>
-                    <div class="mini-timer">23:14</div>
+                    <span>Write landing page</span>
+                    <span class="mac-time">23:14</span>
+                  </div>
+                  <div class="mac-desktop"></div>
+                </div>
+                <div class="demo-label">macOS menu bar</div>
+              </div>
+              <div class="demo-item" data-demo="android">
+                <div class="phone">
+                  <div class="phone-notch"></div>
+                  <div class="share-sheet">
+                    <div class="share-handle"></div>
+                    <div class="share-title">Add to Buubo</div>
+                    <div class="share-input">Write landing page</div>
+                    <div class="share-row">
+                      <span class="share-tag">Things</span>
+                      <button class="share-add" tabindex="-1">Add</button>
+                    </div>
                   </div>
                 </div>
+                <div class="demo-label">Android share</div>
               </div>
-              <div class="demo-label">Web</div>
+              <div class="demo-item" data-demo="web">
+                <div class="browser">
+                  <div class="browser-bar">
+                    <span class="dots"><i></i><i></i><i></i></span>
+                    <span class="browser-url">buubo.app</span>
+                  </div>
+                  <div class="browser-body">
+                    <div class="mini-card">
+                      <span class="pill tiny">DOING</span>
+                      <div class="mini-task">Write landing page</div>
+                      <div class="mini-timer">23:14</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="demo-label">Web</div>
+              </div>
             </div>
             <div class="demo-item" data-demo="mac" aria-hidden="true">
               <div class="mac-window">
@@ -465,106 +524,112 @@
   </div>
 
 <script>
-  const pillEl = document.getElementById('pill');
+  /* ─── Card state cycling ─────────────────────────────────────── */
+  const pillEl  = document.getElementById('pill');
   const timerEl = document.getElementById('timer');
-  const subEl = document.getElementById('cardSub');
+  const subEl   = document.getElementById('cardSub');
 
   const states = [
     { pill: 'CAPTURE', color: '#6B7280', showTimer: false, sub: 'dumped to Things' },
-    { pill: 'NEXT', color: '#F59E0B', showTimer: false, sub: 'waiting in Next Actions' },
-    { pill: 'DOING', color: '#FF6B35', showTimer: true, sub: 'focus now' }
+    { pill: 'NEXT',    color: '#F59E0B', showTimer: false, sub: 'waiting in Next Actions' },
+    { pill: 'DOING',   color: '#FF6B35', showTimer: true,  sub: 'focus now' }
   ];
-  let idx = 0;
-  let secs = 0;
-  let tick = null;
+  let idx = 0, secs = 0, tick = null;
 
   function showState() {
     const s = states[idx];
-    pillEl.textContent = s.pill;
-    pillEl.style.background = s.color;
-    subEl.textContent = s.sub;
+    pillEl.textContent       = s.pill;
+    pillEl.style.background  = s.color;
+    subEl.textContent        = s.sub;
     if (s.showTimer) {
-      timerEl.classList.add('visible');
+      timerEl.style.opacity = '1';   // FIX 1: opacity, not display
       secs = 0;
       timerEl.textContent = '00:00';
       clearInterval(tick);
       tick = setInterval(() => {
         secs++;
-        const m = String(Math.floor(secs/60)).padStart(2,'0');
-        const ss = String(secs%60).padStart(2,'0');
+        const m  = String(Math.floor(secs / 60)).padStart(2, '0');
+        const ss = String(secs % 60).padStart(2, '0');
         timerEl.textContent = `${m}:${ss}`;
       }, 1000);
     } else {
-      timerEl.classList.remove('visible');
+      timerEl.style.opacity = '0';   // FIX 1: opacity, not display
       clearInterval(tick);
     }
   }
 
   showState();
-  setInterval(() => {
-    idx = (idx + 1) % 3;
-    showState();
-  }, 3000);
+  setInterval(() => { idx = (idx + 1) % 3; showState(); }, 3000);
 
-  const what = document.getElementById('what');
-  const how = document.getElementById('how');
-  const whatWrap = document.getElementById('whatWrap');
-  const whatOpen = document.getElementById('whatOpen');
-  const gotit = document.getElementById('gotit');
-  const more = document.getElementById('more');
-  const modal = document.getElementById('modal');
-  const modalClose = document.getElementById('modalClose');
-  const modalBackdrop = document.getElementById('modalBackdrop');
-
-  function openTooltip() {
-    how.classList.add('open');
-    how.setAttribute('aria-hidden', 'false');
-    what.hidden = true;
-    whatOpen.hidden = false;
-    what.setAttribute('aria-expanded', 'true');
-  }
-  function closeTooltip() {
-    how.classList.remove('open');
-    how.setAttribute('aria-hidden', 'true');
-    what.hidden = false;
-    whatOpen.hidden = true;
-    what.setAttribute('aria-expanded', 'false');
+  /* ─── FIX 2: Infinite scroll — clone items on first modal open ─ */
+  function setupInfiniteScroll() {
+    const track = document.getElementById('demoTrack');
+    if (!track || track.dataset.infiniteInit) return;
+    track.dataset.infiniteInit = '1';
+    // Append deep clones of all original items; the doubled track
+    // lets translateX(-50%) loop back to the visual start perfectly.
+    [...track.querySelectorAll('.demo-item')].forEach(item => {
+      const clone = item.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
   }
 
-  what.addEventListener('click', openTooltip);
-  gotit.addEventListener('click', closeTooltip);
+  /* ─── FIX 3: CTA → platform picker ──────────────────────────── */
+  const cta        = document.getElementById('cta');
+  const ctaChoices = document.getElementById('ctaChoices');
+  let choicesOpen  = false;
 
-  const cta = document.getElementById('cta');
-  const launchOptions = document.getElementById('launchOptions');
+  function openChoices() {
+    choicesOpen = true;
+    cta.classList.add('picked');
+    cta.textContent = 'Pick your platform';
+    ctaChoices.removeAttribute('hidden');
+    // Force animation restart on every open
+    ctaChoices.style.animation = 'none';
+    void ctaChoices.offsetWidth; // reflow
+    ctaChoices.style.animation = '';
+  }
+  function closeChoices() {
+    choicesOpen = false;
+    cta.classList.remove('picked');
+    cta.textContent = 'Start now →';
+    ctaChoices.setAttribute('hidden', '');
+  }
+
   cta.addEventListener('click', () => {
-    cta.style.transform = 'scale(0.97)';
-    setTimeout(() => { cta.style.transform = ''; }, 140);
-    document.querySelector('.card').style.animation = 'none';
-    setTimeout(() => document.querySelector('.card').style.animation = 'breathe 4s ease-in-out infinite', 10);
-    cta.hidden = true;
-    launchOptions.classList.add('open');
+    choicesOpen ? closeChoices() : openChoices();
+    // nudge breathe animation
+    const card = document.querySelector('.card');
+    card.style.animation = 'none';
+    setTimeout(() => { card.style.animation = 'breathe 4s ease-in-out infinite'; }, 10);
   });
 
+  // Close choices when clicking outside the cta-wrap area
   document.addEventListener('click', (e) => {
-    if (!how.classList.contains('open')) return;
-    if (whatWrap.contains(e.target) || how.contains(e.target)) return;
-    closeTooltip();
+    if (choicesOpen && !cta.contains(e.target) && !ctaChoices.contains(e.target)) {
+      closeChoices();
+    }
   });
+
+  /* ─── Modal ──────────────────────────────────────────────────── */
+  const more          = document.getElementById('more');
+  const modal         = document.getElementById('modal');
+  const modalClose    = document.getElementById('modalClose');
+  const modalBackdrop = document.getElementById('modalBackdrop');
 
   function openModal() {
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    setupInfiniteScroll();
   }
   function closeModal() {
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
-  more.addEventListener('click', () => {
-    closeTooltip();
-    openModal();
-  });
+  more.addEventListener('click', openModal);
   modalClose.addEventListener('click', closeModal);
   modalBackdrop.addEventListener('click', closeModal);
   document.addEventListener('keydown', (e) => {
