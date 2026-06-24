@@ -1,0 +1,36 @@
+{
+  "name": "buubo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "tsx --test tests/*.test.ts",
+    "db:init": "tsx scripts/init-db.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "next": "^16.2.9",
+    "postgres": "^3.4.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "latest",
+    "@types/node": "^20",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.9",
+    "tsx": "^4.10.1",
+    "typescript": "^5",
+    "wrangler": "^4"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  }
+}
