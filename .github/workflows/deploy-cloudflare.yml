@@ -53,6 +53,6 @@ jobs:
 
       - name: Verify deployed routes
         run: |
-          curl --fail --silent --show-error --location "$DEPLOYMENT_URL/" >/dev/null
-          curl --fail --silent --show-error --location "$DEPLOYMENT_URL/app" >/dev/null
-          curl --fail --silent --show-error --location "$DEPLOYMENT_URL/api/health/db" >/dev/null
+          curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 3 "$DEPLOYMENT_URL/" >/dev/null
+          curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 3 "$DEPLOYMENT_URL/app" >/dev/null
+          curl --fail --silent --show-error --location --retry 5 --retry-all-errors --retry-delay 3 "$DEPLOYMENT_URL/api/health/db" >/dev/null
