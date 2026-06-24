@@ -109,6 +109,7 @@
     opacity: 0;
     transition: opacity 0.35s ease;
   }
+  .timer.visible { visibility: visible; }
   .next {
     font-size: 13px;
     color: #999;
@@ -467,6 +468,54 @@
                 </div>
                 <div class="demo-label">Web</div>
               </div>
+            </div>
+            <div class="demo-item" data-demo="mac" aria-hidden="true">
+              <div class="mac-window">
+                <div class="mac-bar">
+                  <span class="apple"></span>
+                  <span class="mac-app">buubo</span>
+                  <span class="mac-right">⌃⌥⌘</span>
+                </div>
+                <div class="mac-dropdown">
+                  <span class="pill tiny">DOING</span>
+                  <span>Write landing page</span>
+                  <span class="mac-time">23:14</span>
+                </div>
+                <div class="mac-desktop"></div>
+              </div>
+              <div class="demo-label">macOS menu bar</div>
+            </div>
+            <div class="demo-item" data-demo="android" aria-hidden="true">
+              <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="share-sheet">
+                  <div class="share-handle"></div>
+                  <div class="share-title">Add to Buubo</div>
+                  <div class="share-input">Write landing page</div>
+                  <div class="share-row">
+                    <span class="share-tag">Things</span>
+                    <button class="share-add" tabindex="-1">Add</button>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-label">Android share</div>
+            </div>
+            <div class="demo-item" data-demo="web" aria-hidden="true">
+              <div class="browser">
+                <div class="browser-bar">
+                  <span class="dots"><i></i><i></i><i></i></span>
+                  <span class="browser-url">buubo.app</span>
+                </div>
+                <div class="browser-body">
+                  <div class="mini-card">
+                    <span class="pill tiny">DOING</span>
+                    <div class="mini-task">Write landing page</div>
+                    <div class="mini-timer">23:14</div>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-label">Web</div>
+            </div>
             </div>
           </div>
         </div>
