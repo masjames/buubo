@@ -11,11 +11,11 @@ import {
   type CanonicalGTDState,
 } from "@/shared/viga-state";
 import { getVisibleThingActions } from "@/shared/viga-actions";
-import { useCapture } from "./hooks/useCapture";
-import { useNightLight } from "./hooks/useNightLight";
-import { storage } from "./hooks/storage";
-import { useThings } from "./hooks/useThings";
-import type { Thing } from "./types";
+import { useCapture } from "../hooks/useCapture";
+import { useNightLight } from "../hooks/useNightLight";
+import { storage } from "../hooks/storage";
+import { useThings } from "../hooks/useThings";
+import type { Thing } from "../types";
 
 type Tab = "flow" | "things";
 type SheetState =
