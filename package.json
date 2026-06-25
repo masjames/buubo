@@ -4,13 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "opennextjs-cloudflare build",
+    "build": "next build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "npm run opennext:build && npm run cf:deploy",
     "start": "next start",
     "lint": "eslint .",
     "test": "tsx --test tests/*.test.ts",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "opennext:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare deploy -- --keep-vars",
+    "cf:upload": "opennextjs-cloudflare upload -- --keep-vars",
+    "upload": "npm run opennext:build && npm run cf:upload"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
