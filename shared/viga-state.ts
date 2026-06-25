@@ -2,6 +2,7 @@ export type CanonicalGTDState =
   | "inbox"
   | "waiting"
   | "next_action"
+  | "parked"
   | "doing"
   | "done"
   | "dropped";
@@ -45,6 +46,7 @@ export type ThingStateSource = {
 export function normalizeGtdStateValue(state?: string, status?: string): CanonicalGTDState {
   if (state === "doing" || state === "do_now") return "doing";
   if (state === "next_action" || state === "next_things") return "next_action";
+  if (state === "parked") return "parked";
   if (
     state === "waiting" ||
     state === "waiting_delegate" ||

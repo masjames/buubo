@@ -1,0 +1,17 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloudflare Workers Builds handles deployment
+        run: |
+          echo "Deployment is handled by Cloudflare Workers Builds."
+          echo "This GitHub check intentionally does not run wrangler secret put or deploy."
