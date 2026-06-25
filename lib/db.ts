@@ -1,15 +1,18 @@
 import postgres from 'postgres';
 
-const DATABASE_ENV_KEYS = [
-  'DATABASE_URL',
-  'POSTGRES_URL',
-  'POSTGRES_PRISMA_URL',
-  'POSTGRES_URL_NON_POOLING',
-  'DATABASE_URL_UNPOOLED',
+const DATABASE_ENV_VALUES = [
+  ['DATABASE_URL', process.env.DATABASE_URL],
+  ['POSTGRES_URL', process.env.POSTGRES_URL],
+  ['POSTGRES_PRISMA_URL', process.env.POSTGRES_PRISMA_URL],
+  ['POSTGRES_URL_NON_POOLING', process.env.POSTGRES_URL_NON_POOLING],
+  ['DATABASE_URL_UNPOOLED', process.env.DATABASE_URL_UNPOOLED],
 ] as const;
 
-export const databaseEnvKey = DATABASE_ENV_KEYS.find(key => Boolean(process.env[key]));
-const DATABASE_URL = databaseEnvKey ? process.env[databaseEnvKey] : undefined;
+const DATABASE_ENV_KEYS = DATABASE_ENV_VALUES.map(([key]) => key);
+const databaseEnv = DATABASE_ENV_VALUES.find(([, value]) => Boolean(value));
+
+export const databaseEnvKey = databaseEnv?.[0];
+const DATABASE_URL = databaseEnv?.[1];
 
 let sql: any;
 
