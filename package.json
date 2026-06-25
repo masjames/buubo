@@ -14,7 +14,8 @@
     "opennext:build": "opennextjs-cloudflare build",
     "cf:deploy": "opennextjs-cloudflare deploy -- --keep-vars",
     "cf:upload": "opennextjs-cloudflare upload -- --keep-vars",
-    "upload": "npm run opennext:build && npm run cf:upload"
+    "upload": "npm run opennext:build && npm run cf:upload",
+    "postinstall": "node scripts/install-wrangler-shim.cjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

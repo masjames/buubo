@@ -1,8 +1,8 @@
 # Cloudflare deployment
 
-This repository should use **one** deployment pipeline: Cloudflare Workers Builds.
-Do not also run the old GitHub Actions deploy workflow, because that creates a
-second build/deploy path and can race with Cloudflare Worker versions and secrets.
+This repository uses **Cloudflare Workers Builds** as the deployment pipeline.
+Do not also run a GitHub Actions deploy workflow, because that creates a second
+build/deploy path and can race with Cloudflare Worker versions and secrets.
 
 ## Cloudflare Workers Builds settings
 
@@ -11,23 +11,23 @@ In Cloudflare, open the `buubo` Worker, then go to **Settings → Build** and se
 | Setting | Value |
 | --- | --- |
 | Production branch | `main` |
-| Build command | `npm run opennext:build` |
-| Deploy command | `npm run cf:deploy` |
-| Non-production branch deploy command | `npm run upload` |
+| Deploy command | `npx wrangler deploy` |
 
-Why the split matters:
-
-- `npm run opennext:build` creates the `.open-next` build output.
-- `npm run cf:deploy` deploys the already-built OpenNext output without rebuilding.
-- `npm run upload` builds and uploads preview Worker versions for non-production branches.
-
-Do **not** leave the Cloudflare deploy command as the default `npx wrangler deploy`.
-Wrangler detects `open-next.config.ts` and delegates directly to
-`opennextjs-cloudflare deploy`, which expects `.open-next` to already exist. If no
-build command ran first, Cloudflare fails with:
+Cloudflare's default deploy command is intentionally supported. During `npm
+clean-install`, the repository installs a small local Wrangler shim in
+`node_modules/.bin/wrangler`. When Cloudflare later runs `npx wrangler deploy`,
+the shim checks for `.open-next` output and runs `npm run opennext:build` first
+if the output is missing. That prevents Wrangler's OpenNext delegation from
+failing with:
 
 ```text
 ERROR Could not find compiled Open Next config, did you run the build command?
+```
+
+For local/manual deployment, use:
+
+```bash
+npm run deploy
 ```
 
 ## Runtime secrets
