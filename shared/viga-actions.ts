@@ -21,8 +21,9 @@ export function getVisibleThingActions(state: CanonicalGTDState, surface: VigaSu
   }
 
   if (surface === "things") {
-    if (state === "inbox") return ["next_action", "waiting", "archive"];
+    if (state === "inbox") return ["next_action", "waiting", "parked", "archive"];
     if (state === "waiting") return ["doing", "next_action", "inbox", "archive"];
+    if (state === "parked") return ["next_action", "inbox", "archive"];
   }
   return [];
 }
