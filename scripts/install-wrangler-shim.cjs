@@ -41,11 +41,14 @@ function run(command, commandArgs, options = {}) {
   }
 }
 
-const isDeploy = args[0] === 'deploy';
+const needsOpenNextBuild =
+  args[0] === 'deploy' ||
+  args[0] === 'upload' ||
+  (args[0] === 'versions' && args[1] === 'upload');
 const isOpenNextDelegatedDeploy = process.env.OPEN_NEXT_DEPLOY === 'true';
 
-if (isDeploy && !isOpenNextDelegatedDeploy && !fs.existsSync(compiledOpenNextConfig)) {
-  console.log('[wrangler-shim] Missing .open-next build output; running npm run opennext:build before wrangler deploy.');
+if (needsOpenNextBuild && !isOpenNextDelegatedDeploy && !fs.existsSync(compiledOpenNextConfig)) {
+  console.log('[wrangler-shim] Missing .open-next build output; running npm run opennext:build before wrangler deploy/upload.');
   run('npm', ['run', 'opennext:build']);
 }
 
